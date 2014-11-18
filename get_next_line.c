@@ -6,50 +6,58 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/15 13:46:44 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/11/18 08:20:17 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/11/18 16:33:29 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include <stdio.h>
-char	*get_line(int const fd, char *str)
-{
-	char	stock[BUFF_SIZE];
-	char 	*tmp;
-	static char *offset;
 
-	stock[0] = 0;
-	while(!(offset = ft_strchr(stock, '\n')))
+char	*text_copy(int const fd, char *text)
+{
+	char	*stock;
+	char 	*tmp;
+	int		ret;
+
+	stock = ft_strnew(BUFF_SIZE);
+	ret = 0;
+	while ((ret = read(fd, stock, BUFF_SIZE)))
 	{
-		read(fd, stock, BUFF_SIZE);
-		tmp = str;
-		stock[BUFF_SIZE] = 0;
-		str = ft_strjoin(str, stock);
+		tmp = text;
+		stock[ret] = 0;
+		text = ft_strjoin(text, stock);
 		ft_strdel(&tmp);
 	}
-//	printf("stock = %s\n", stock);
-//	printf("offset = %s\n", offset);
-//	printf("line = %s\n", str);
-	return (str);
+	return (text);
+}
+
+char	*get_line(char *stock, int offset)
+{
+	char	*line;
+	int		start;
+
+	start = offset;
+	while (stock[offset] && stock[offset] != '\n')
+		offset++;
+	line = ft_strsub(stock, start, offset - start);
+	offset += 1;
+	return (line);
 }
 
 int	get_next_line(int const fd, char** line)
 {
-	char	*stock;
-	int	ret;
+	static unsigned int	offset;
+	char		*text;
 
-	stock = ft_strnew(BUFF_SIZE);
-	ret = read(fd, stock, BUFF_SIZE);
-	if (fd == -1 || !(line) || ret == -1)
+	offset = 0;
+	text = ft_strnew(BUFF_SIZE);
+	if (fd == -1 || !(line))
 		return (-1);
-//	stock = ft_strnew(BUFF_SIZE);
-	if (ret == BUFF_SIZE)
-	{
-		*line = get_line(fd, stock);
-		return(1);
-	}
-	else
-		return (0);
-	//	printf("offset = %s\n", offset);
+	if (offset == 0)
+		text = text_copy(fd, text);
+	printf("taille text = %ld\n", ft_strlen(text));
+	*line = get_line(text, offset);
+	if (ft_strlen(text) > offset)
+		return (1);
+	return (0);
 }
-
