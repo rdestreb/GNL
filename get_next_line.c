@@ -6,35 +6,50 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/15 13:46:44 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/11/15 17:52:24 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/11/18 08:20:17 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-
-char	*get_line(char *str, int const fd)
+#include <stdio.h>
+char	*get_line(int const fd, char *str)
 {
-//	int		ret;
 	char	stock[BUFF_SIZE];
+	char 	*tmp;
+	static char *offset;
 
-//	ret = 0;
-	if(!(ft_strchr(stock, '\n')))
-		while(/*ret = */read(fd, stock, BUFF_SIZE))
-			str = ft_strjoin(str, stock);
+	stock[0] = 0;
+	while(!(offset = ft_strchr(stock, '\n')))
+	{
+		read(fd, stock, BUFF_SIZE);
+		tmp = str;
+		stock[BUFF_SIZE] = 0;
+		str = ft_strjoin(str, stock);
+		ft_strdel(&tmp);
+	}
+//	printf("stock = %s\n", stock);
+//	printf("offset = %s\n", offset);
+//	printf("line = %s\n", str);
 	return (str);
 }
-/*
+
 int	get_next_line(int const fd, char** line)
 {
-	char	stock[BUFF_SIZE];
-	int		i;
-	int		ret;
+	char	*stock;
+	int	ret;
 
-	if (fd == -1)
+	stock = ft_strnew(BUFF_SIZE);
+	ret = read(fd, stock, BUFF_SIZE);
+	if (fd == -1 || !(line) || ret == -1)
 		return (-1);
-	ret = 0;
-	while (read(fd, stock, BUFF_SIZE) == BUFF_SIZE)
-
-	return(0);
+//	stock = ft_strnew(BUFF_SIZE);
+	if (ret == BUFF_SIZE)
+	{
+		*line = get_line(fd, stock);
+		return(1);
+	}
+	else
+		return (0);
+	//	printf("offset = %s\n", offset);
 }
-*/
+
