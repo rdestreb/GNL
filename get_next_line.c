@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/15 13:46:44 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/11/18 16:33:29 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/11/19 12:08:58 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,33 +31,45 @@ char	*text_copy(int const fd, char *text)
 	return (text);
 }
 
-char	*get_line(char *stock, int offset)
+char	*get_line(char *offset, char **line)
 {
-	char	*line;
-	int		start;
+	char 	*tmp;
 
-	start = offset;
-	while (stock[offset] && stock[offset] != '\n')
-		offset++;
-	line = ft_strsub(stock, start, offset - start);
-	offset += 1;
-	return (line);
+	if ((tmp = ft_strchr(offset, '\n')))
+	{
+		//	printf("TMP = %s\n", tmp);
+		*line = ft_strsub(offset, 0, ft_strlen(offset) - ft_strlen(tmp));
+//		printf("%s\n", tmp);
+
+		offset = ft_strdup(tmp + 1);
+//		printf("offset 1 = %s\n", offset);
+
+	}
+	else
+	{
+		*line = ft_strdup(offset);
+		ft_strdel(&offset);
+	}
+	return (offset);
 }
 
-int	get_next_line(int const fd, char** line)
+int		get_next_line(int const fd, char **line)
 {
-	static unsigned int	offset;
-	char		*text;
+	static char	*offset;
 
-	offset = 0;
-	text = ft_strnew(BUFF_SIZE);
 	if (fd == -1 || !(line))
 		return (-1);
-	if (offset == 0)
-		text = text_copy(fd, text);
-	printf("taille text = %ld\n", ft_strlen(text));
-	*line = get_line(text, offset);
-	if (ft_strlen(text) > offset)
+	if (!offset)
+	{
+//		printf("coucou\n");
+		offset = ft_strnew(BUFF_SIZE);
+		offset = text_copy(fd, offset);
+	}
+//	printf("taille text = %ld\n", ft_strlen(offset));
+	offset = get_line(offset, line);
+//	printf("offset 2 = %s\n", offset);
+	if (offset[0] != 0)
 		return (1);
-	return (0);
+	else
+		return (0);
 }
