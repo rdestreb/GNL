@@ -15,14 +15,17 @@
 
 char	*text_copy(int const fd, char *text)
 {
-	char	*stock;
+	char	stock[BUFF_SIZE + 1];
 	char 	*tmp;
 	int		ret;
+	int		flag;
 
-	stock = ft_strnew(BUFF_SIZE);
+	flag = 0;
 	ret = 0;
-	while ((ret = read(fd, stock, BUFF_SIZE)))
+	while ((!flag && !ret) || !(ft_strchr(text, '\n'))) 
 	{
+		flag = 1;
+		ret = read(fd, stock, BUFF_SIZE);
 		tmp = text;
 		stock[ret] = 0;
 		text = ft_strjoin(text, stock);
@@ -38,7 +41,7 @@ char	*get_line(char *offset, char **line)
 	if ((tmp = ft_strchr(offset, '\n')))
 	{
 		*line = ft_strsub(offset, 0, ft_strlen(offset) - ft_strlen(tmp));
-		offset = ft_strdup(tmp + 1);
+		offset = tmp + 1;
 	}
 	else
 	{
@@ -50,15 +53,11 @@ char	*get_line(char *offset, char **line)
 
 int		get_next_line(int const fd, char **line)
 {
-	static char	*offset;
+	static char	*offset = NULL;
 
-	if (fd == -1 || !(line))
+	if (fd < 0 || !(line))
 		return (-1);
-	if (!offset)
-	{
-		offset = ft_strnew(BUFF_SIZE);
-		offset = text_copy(fd, offset);
-	}
+	offset = text_copy(fd, offset);
 	offset = get_line(offset, line);
 	if (offset[0] != 0)
 		return (1);
