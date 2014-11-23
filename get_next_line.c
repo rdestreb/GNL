@@ -11,37 +11,41 @@
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <stdio.h>
 
-char	*text_copy(int const fd, char *text)
+static int text_copy(int const fd, char **text)
 {
 	char	stock[BUFF_SIZE + 1];
-	char 	*tmp;
+	char	*tmp;
 	int		ret;
-	int		flag;
 
-	flag = 0;
-	ret = 0;
-	while ((!flag && !ret) || !(ft_strchr(text, '\n'))) 
+	tmp = NULL;
+	ret = -2;
+	while ((!ft_strchr(*text, '\n')))
 	{
-		flag = 1;
-		ret = read(fd, stock, BUFF_SIZE);
-		tmp = text;
+		if ((ret = read(fd, stock, BUFF_SIZE)) <= 0)
+			return (ret);
+		tmp = *text;
 		stock[ret] = 0;
-		text = ft_strjoin(text, stock);
+		if (!(*text = ft_strjoin(*text, stock)))
+			return (-1);
 		ft_strdel(&tmp);
+		if (ret < BUFF_SIZE)
+			return (ret);
 	}
-	return (text);
+	return (ret);
 }
 
-char	*get_line(char *offset, char **line)
+static char	*get_line(char *offset, char **line)
 {
-	char 	*tmp;
+	char	*tmp;
+	char	*del;
 
-	if ((tmp = ft_strchr(offset, '\n')))
+	del = offset;
+	if (offset && (tmp = ft_strchr(offset, '\n')))
 	{
 		*line = ft_strsub(offset, 0, ft_strlen(offset) - ft_strlen(tmp));
-		offset = tmp + 1;
+		offset = ft_strdup(tmp + 1);
+		ft_strdel(&del);
 	}
 	else
 	{
@@ -54,13 +58,17 @@ char	*get_line(char *offset, char **line)
 int		get_next_line(int const fd, char **line)
 {
 	static char	*offset = NULL;
+	int			ret;
 
 	if (fd < 0 || !(line))
 		return (-1);
-	offset = text_copy(fd, offset);
+	if (!offset)
+		offset = ft_strnew(0);
+	if ((ret = text_copy(fd, &offset)) == -1)
+		return (-1);
 	offset = get_line(offset, line);
-	if (offset[0] != 0)
-		return (1);
-	else
+	if ((!ret && !ft_strlen(offset)))
 		return (0);
+	else
+		return (1);
 }
