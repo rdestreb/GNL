@@ -6,13 +6,13 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/15 13:46:44 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/11/19 17:19:07 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/11/24 12:05:30 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static int text_copy(int const fd, char **text)
+static int	text_copy(int const fd, char **text)
 {
 	char	stock[BUFF_SIZE + 1];
 	char	*tmp;
@@ -55,7 +55,7 @@ static char	*get_line(char *offset, char **line)
 	return (offset);
 }
 
-int		get_next_line(int const fd, char **line)
+int			get_next_line(int const fd, char **line)
 {
 	static char	*offset = NULL;
 	int			ret;
