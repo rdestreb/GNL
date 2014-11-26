@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/15 13:46:44 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/11/24 12:05:30 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/11/26 16:15:27 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,14 +60,14 @@ int			get_next_line(int const fd, char **line)
 	static char	*offset = NULL;
 	int			ret;
 
-	if (fd < 0 || !(line))
+	if (!(line))
 		return (-1);
 	if (!offset)
 		offset = ft_strnew(0);
 	if ((ret = text_copy(fd, &offset)) == -1)
 		return (-1);
 	offset = get_line(offset, line);
-	if ((!ret && !ft_strlen(offset)))
+	if ((!ret && !ft_strlen(offset) && !ft_strlen(*line)))
 		return (0);
 	else
 		return (1);
